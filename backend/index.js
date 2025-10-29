@@ -1,10 +1,20 @@
-const express= require('express')
-require('dotenv').config()
+const express = require("express");
+const connectDB = require("./src/config/db");
+require("dotenv").config();
 
-const app= express()
+const app = express();
 
-const PORT= process.env.PORT || 5001
+const PORT = process.env.PORT || 5001;
 
-app.listen(PORT,()=>{
-    console.log("server is running on port",PORT)
-})
+// middlewares
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// database
+connectDB();
+
+// routes
+
+app.listen(PORT, () => {
+  console.log("server is running on port", PORT);
+});
