@@ -128,13 +128,17 @@ const logoutUser = (req, res) => {
 // get user's profile
 const getUserProfile = async (req, res) => {
   try {
-    const userProfile = await userModel.findById(req.user._id).select("-password");
+    const userProfile = await userModel
+      .findById(req.user._id)
+      .select("-password");
     if (!userProfile) {
       return res
         .status(404)
         .json({ message: "user profile data is not found" });
     }
-    return res.status(200).json({message:'user is this', success: true, userProfile})
+    return res
+      .status(200)
+      .json({ message: "user is this", success: true, userProfile });
   } catch (error) {
     console.error(error);
     return res.status(500).json({
@@ -161,13 +165,11 @@ const updateUserProfile = async (req, res) => {
 
     const updatedUser = await user.save();
 
-    return res
-      .status(200)
-      .json({
-        message: "user updated successfully",
-        success: true,
-        updatedUser,
-      });
+    return res.status(200).json({
+      message: "user updated successfully",
+      success: true,
+      updatedUser,
+    });
   } catch (error) {
     console.error(error);
     return res.status(500).json({
@@ -176,6 +178,77 @@ const updateUserProfile = async (req, res) => {
   }
 };
 
+// update user password
+const updatePassword = async (req, res) => {
+  try {
+    const user = await userModel.findById(req.user._id);
+
+    if (!user) {
+      return res.status(404).json({ message: "old password not found" });
+    }
+
+    const { oldPassword, newPassword } = req.body;
+
+    const isMatch = await bcrypt.compare(oldPassword, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ message: "old password is wrong" });
+    }
+
+    user.password = await bcrypt.hash(newPassword, 10);
+    await user.save();
+
+    return res.status(200).json({ message: "password updated successfully." });
+  } catch (error) {
+    console.error(error);
+    return res
+      .status(500)
+      .json({ message: "you can't update the user password" });
+  }
+};
+
+// get all users list
+
+const getAllUsers = async (req, res) => {
+  try {
+    const users = await userModel.find().select("-password");
+
+    if (!users) {
+      return res.status(400).json({
+        message: "users not found || only admin can get all the users",
+      });
+    }
+
+    const totalUsers= await userModel.countDocuments()
+
+
+    return res.status(200).json({
+      message: "This is the list of the users in our db",
+      success: true,
+      totalUsers,
+      users,
+    });
+  } catch (error) {
+    console.error(error);
+    return res
+      .status(500)
+      .json({ message: "you are unauthorized|| only admin can do this" });
+  }
+};
+
+// delete the user by id 
+
+const deleteUser = async (req, res) => {
+  try {
+    const user = await userModel.findByIdAndDelete(req.params.id);
+    if (!user) return res.status(404).json({ message: "User not found!" });
+    res.status(200).json({ message: "User deleted successfully!" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error deleting user!" });
+  }
+};
+
+
 // Export
 module.exports = {
   signUp,
@@ -183,4 +256,7 @@ module.exports = {
   logoutUser,
   getUserProfile,
   updateUserProfile,
+  updatePassword,
+  getAllUsers,
+  deleteUser,
 };

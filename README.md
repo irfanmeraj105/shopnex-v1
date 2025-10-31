@@ -4,6 +4,7 @@ cookie-parser use hota hy cookie send krny k lia jub user login aur logout hota 
 
 
 Endpoints ===>
-http://localhost/5000/register 
-http://localhost/5000/login
-http://localhost/5000/logout
+http://localhost/5000/auth/register 
+http://localhost/5000/auth/login
+http://localhost/5000/auth/logout
+http://localhost/5000/users/profile
