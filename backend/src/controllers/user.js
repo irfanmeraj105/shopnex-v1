@@ -125,9 +125,62 @@ const logoutUser = (req, res) => {
   }
 };
 
+// get user's profile
+const getUserProfile = async (req, res) => {
+  try {
+    const userProfile = await userModel.findById(req.user._id).select("-password");
+    if (!userProfile) {
+      return res
+        .status(404)
+        .json({ message: "user profile data is not found" });
+    }
+    return res.status(200).json({message:'user is this', success: true, userProfile})
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      message: "Internal server error || can't get the user profile data",
+    });
+  }
+};
+
+// update the user profile
+const updateUserProfile = async (req, res) => {
+  try {
+    const user = await userModel.findById(req.user._id);
+    if (!user) {
+      return res
+        .status(404)
+        .json({ message: "user not found || for the updating" });
+    }
+
+    const { name, avatar, address } = req.body;
+
+    if (name) user.name = name;
+    if (avatar) user.avatar = avatar;
+    if (address) user.address = address;
+
+    const updatedUser = await user.save();
+
+    return res
+      .status(200)
+      .json({
+        message: "user updated successfully",
+        success: true,
+        updatedUser,
+      });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      message: "internal server error || can't update the user profile",
+    });
+  }
+};
+
 // Export
 module.exports = {
   signUp,
   userLogin,
   logoutUser,
+  getUserProfile,
+  updateUserProfile,
 };
