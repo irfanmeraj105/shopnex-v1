@@ -218,8 +218,7 @@ const getAllUsers = async (req, res) => {
       });
     }
 
-    const totalUsers= await userModel.countDocuments()
-
+    const totalUsers = await userModel.countDocuments();
 
     return res.status(200).json({
       message: "This is the list of the users in our db",
@@ -235,7 +234,7 @@ const getAllUsers = async (req, res) => {
   }
 };
 
-// delete the user by id 
+// delete the user by id
 
 const deleteUser = async (req, res) => {
   try {
@@ -247,7 +246,6 @@ const deleteUser = async (req, res) => {
     res.status(500).json({ message: "Error deleting user!" });
   }
 };
-
 
 // Export
 module.exports = {
