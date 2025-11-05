@@ -5,47 +5,47 @@ const jwt = require("jsonwebtoken");
 // Create User (Sign Up)
 const signUp = async (req, res) => {
   try {
-    const { name, email, password, role, avatar, address } = req.body;
+    const { name, email, password, address } = req.body;
 
-    // Validation
-    if (!name || !email || !password || !role || !avatar || !address) {
-      return res.status(400).json({ message: "All fields are required!" });
+    // 🧩 Basic Validation
+    if (!name || !email || !password) {
+      return res.status(400).json({ message: "Name, email, and password are required!" });
     }
 
-    // Check if user already exists
+    // 🔍 Check if user already exists
     const existedUser = await userModel.findOne({ email });
     if (existedUser) {
       return res.status(400).json({ message: "User already exists!" });
     }
 
-    // Hash password
+    // 🔒 Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create new user
+    // 🧠 Create new user with defaults
     const user = await userModel.create({
       name,
       email,
       password: hashedPassword,
-      role,
-      avatar,
-      address,
+      address: address || "", // optional
+      role: "user", // ✅ default role
+      avatar:
+        "https://res.cloudinary.com/demo/image/upload/v1691515333/default-avatar.png", // ✅ default avatar
     });
 
-    // Send response
+    // ✅ Response
     res.status(201).json({
       success: true,
       message: "User registered successfully!",
       user,
-    });
+    });   
   } catch (error) {
-    console.error(error);
+    console.error("Signup error:", error);
     res.status(500).json({
       success: false,
       message: "Server error. Please try again later.",
     });
   }
 };
-
 // user login function
 
 const userLogin = async (req, res) => {
